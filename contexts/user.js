@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import firebase from "firebase";
 import "firebase/auth";
@@ -22,7 +23,8 @@ const UsuarioProvider = ({ children }) => {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then((resp) => {
-        // console.warn(resp)
+        AsyncStorage.setItem("emailLogin", email);
+        AsyncStorage.setItem("passwordLogin", password);
       })
       .catch((err) => {
         console.warn(err);

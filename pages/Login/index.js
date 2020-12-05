@@ -1,5 +1,7 @@
-import React, { useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { ScrollView, Text, Image, ActivityIndicator } from "react-native";
+import * as LocalAuthentication from "expo-local-authentication";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
   Container,
@@ -31,6 +33,36 @@ const Login = () => {
   const [email, setEmail] = useState("felippesouza97@outlook.com");
   const [carregando, setCarregando] = useState(false);
   const [password, setPassword] = useState("#Teste12");
+
+  useEffect(() => {
+    this.checkDeviceForHardware();
+  });
+
+  checkDeviceForHardware = async () => {
+    let compatible = await LocalAuthentication.hasHardwareAsync();
+    if (compatible) {
+      let result = await LocalAuthentication.authenticateAsync();
+      if (result.success) {
+        var email;
+        var password;
+        await AsyncStorage.getItem("emailLogin").then(
+          (response) => (email = response)
+        );
+        await AsyncStorage.getItem("passwordLogin").then(
+          (response) => (password = response)
+        );
+        if (email == null || password == null) {
+          alert("Digite seu usuário e senha para autenticar sua biometria.");
+        } else {
+          signIn(email, password);
+        }
+      } else {
+        alert("Autenticação cancelada");
+      }
+    } else {
+      alert("Current device does not have the necessary hardware!");
+    }
+  };
 
   function handleSignIn() {
     try {
